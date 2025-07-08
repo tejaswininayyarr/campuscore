@@ -1,16 +1,13 @@
 // lib/main.dart
-
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-//import '
 // Import the generated Firebase options file. This file is created by
 // `flutterfire configure`.
 // If you see an error here, re-run `flutterfire configure` in your
 // project root.
 import 'firebase_options.dart';
-
 // Import custom services and screens
 import 'event_screen.dart';
 import 'academic.dart';
