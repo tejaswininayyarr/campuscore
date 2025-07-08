@@ -1,11 +1,18 @@
 // lib/home_screen.dart
 
-// This is the main screen displayed after a user successfully logs in.
-// It provides navigation to various features of the College Connect app.
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Required for User type
-import 'package:cloud_firestore/cloud_firestore.dart'; // REQUIRED to fetch username from Firestore
-import 'auth_service.dart'; // Import the AuthService for logout functionality
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'auth_service.dart'; // Make sure this path is correct
+
+// Import the content widgets for your bottom nav tabs.
+// These screens (AcademicResourcesScreen, CampusEventsScreen) should NOT have their own Scaffold or AppBar.
+import 'academic.dart'; // Ensure path is correct
+import 'event_screen.dart';       // Ensure path is correct
+
+// Import other screens accessible via the Drawer (these will still be full Scaffolds)
+
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,26 +25,86 @@ class _HomeScreenState extends State<HomeScreen> {
   final AuthService _authService = AuthService();
   String _username = 'Loading...';
   User? _currentUser;
-  int _selectedIndex = 0; // Keep track of selected tab for home view
+  int _selectedIndex = 0; // Tracks the currently selected tab for the BottomNavigationBar
 
-  // Flag to ensure the SnackBar is shown only once when the screen is first loaded
+  // List of widgets corresponding to each tab in the BottomNavigationBar.
+  // The first widget is the content for the "Home" tab.
+  late final List<Widget> _widgetOptions;
+
+  // Titles for the AppBar that will change based on the selected tab.
+  final List<String> _appBarTitles = const [
+    'College Connect',      // Title for 'Home' tab
+    'Academic Resources',   // Title for 'Academic' tab
+    'Campus Events',        // Title for 'Event' tab
+  ];
+
+  // Flag to ensure the profile update SnackBar is shown only once per screen load.
   bool _profileUpdateHandled = false;
 
   @override
   void initState() {
     super.initState();
     _currentUser = FirebaseAuth.instance.currentUser;
-    _fetchUsername(); // Initiate fetching the username from Firestore
+    _fetchUsername(); // Initiate fetching username from Firestore
+
+    // Initialize the list of widgets for our IndexedStack.
+    // The first item is the actual content for the "Home" tab.
+    _widgetOptions = <Widget>[
+      // Content for the "Home" tab directly embedded here
+      SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Card(
+                color: Colors.blue.shade50,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.waving_hand, size: 40, color: Colors.orange),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Text(
+                          // Using a placeholder username initially, will be updated when fetched.
+                          'Hello, $_username!',
+                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue.shade900),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              const Center(
+                child: Text(
+                  'Welcome to College Connect!',
+                  style: TextStyle(fontSize: 18, color: Colors.black87),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Add any other specific content for the Home tab here
+            ],
+          ),
+        ),
+      ),
+      const AcademicResourcesScreen(), // Content for the "Academic" tab (from its separate file)
+      const CampusEventsScreen(),       // Content for the "Event" tab (from its separate file)
+    ];
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    // Check for profile update arguments only once when the dependencies change.
     if (!_profileUpdateHandled) {
       _showProfileUpdateSuccess();
     }
   }
 
+  // Displays a SnackBar if a profile update was successful (from a previous screen).
   void _showProfileUpdateSuccess() {
     final args = ModalRoute.of(context)?.settings.arguments;
     if (args != null && args is Map && args['profileUpdated'] == true) {
@@ -48,10 +115,11 @@ class _HomeScreenState extends State<HomeScreen> {
           duration: const Duration(seconds: 3),
         ),
       );
-      _profileUpdateHandled = true;
+      _profileUpdateHandled = true; // Set flag to true to prevent re-showing.
     }
   }
 
+  // Fetches the username from Firestore based on the current user's UID.
   Future<void> _fetchUsername() async {
     if (_currentUser != null) {
       try {
@@ -63,30 +131,184 @@ class _HomeScreenState extends State<HomeScreen> {
         if (userDoc.exists) {
           setState(() {
             _username = userDoc.get('name') ?? 'User';
+            // Update the Home content widget in _widgetOptions with the fetched username.
+            _widgetOptions[0] = SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Card(
+                      color: Colors.blue.shade50,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.waving_hand, size: 40, color: Colors.orange),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Text(
+                                'Hello, $_username!',
+                                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue.shade900),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    const Center(
+                      child: Text(
+                        'Welcome to College Connect!',
+                        style: TextStyle(fontSize: 18, color: Colors.black87),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            );
           });
         } else {
+          // Fallback if user document doesn't exist
           setState(() {
             _username = _currentUser!.email ?? 'Guest';
+            _widgetOptions[0] = SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Card(
+                      color: Colors.blue.shade50,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.waving_hand, size: 40, color: Colors.orange),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Text(
+                                'Hello, $_username!',
+                                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue.shade900),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    const Center(
+                      child: Text(
+                        'Welcome to College Connect!',
+                        style: TextStyle(fontSize: 18, color: Colors.black87),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            );
           });
         }
       } catch (e) {
         print("Error fetching username: $e");
         setState(() {
           _username = _currentUser!.email ?? 'Guest';
+          _widgetOptions[0] = SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Card(
+                    color: Colors.blue.shade50,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.waving_hand, size: 40, color: Colors.orange),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Text(
+                              'Hello, $_username!',
+                              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue.shade900),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  const Center(
+                    child: Text(
+                      'Welcome to College Connect!',
+                      style: TextStyle(fontSize: 18, color: Colors.black87),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          );
         });
       }
     } else {
       setState(() {
         _username = 'Guest';
+        _widgetOptions[0] = SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Card(
+                  color: Colors.blue.shade50,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.waving_hand, size: 40, color: Colors.orange),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Text(
+                            'Hello, $_username!',
+                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue.shade900),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const Center(
+                  child: Text(
+                    'Welcome to College Connect!',
+                    style: TextStyle(fontSize: 18, color: Colors.black87),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        );
       });
     }
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  // Handles taps on the BottomNavigationBar items.
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index; // Updates the selected index, triggering IndexedStack to show new content.
+    });
+    // No Navigator.pushNamed here, as we are just switching content within this same Scaffold.
   }
 
+  // Helper method to show a SnackBar message.
   void _showSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -99,72 +321,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _homeContentView() {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Card(
-              color: Colors.blue.shade50,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    const Icon(Icons.waving_hand, size: 40, color: Colors.orange),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Text(
-                        'Hello, $_username!',
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue.shade900),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            // You can add other introductory content or a message here if desired
-            Center(
-              child: Text(
-                'Welcome to College Connect!',
-                style: TextStyle(fontSize: 18, color: Colors.grey.shade700),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-
-    // Navigate to different screens based on selected index
-    switch (index) {
-      case 0:
-        // Already on home, no explicit navigation needed, but ensure it's the top
-        // Navigator.popUntil(context, ModalRoute.withName('/home')); // Use if home needs to be root
-        break;
-      case 1:
-        Navigator.of(context).pushNamed('/academic_resources');
-        break;
-      case 2:
-        Navigator.of(context).pushNamed('/campus_events');
-        break;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('College Connect', style: TextStyle(color: Colors.white)),
+        title: Text(
+          _appBarTitles[_selectedIndex], // App bar title changes with the selected tab
+          style: const TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.blue.shade700,
         elevation: 0,
         leading: Builder(
@@ -172,7 +336,7 @@ class _HomeScreenState extends State<HomeScreen> {
             return IconButton(
               icon: const Icon(Icons.menu, color: Colors.white),
               onPressed: () {
-                Scaffold.of(context).openDrawer();
+                Scaffold.of(context).openDrawer(); // Open the drawer
               },
             );
           },
@@ -185,7 +349,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: <Widget>[
             UserAccountsDrawerHeader(
               accountName: Text(
-                _username,
+                _username, // Displays the fetched username
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -214,7 +378,7 @@ class _HomeScreenState extends State<HomeScreen> {
               title: const Text('Home'),
               onTap: () {
                 Navigator.pop(context); // Close the drawer
-                _onItemTapped(0); // Select Home tab
+                _onItemTapped(0); // Manually set to Home tab
               },
             ),
             ListTile(
@@ -222,7 +386,7 @@ class _HomeScreenState extends State<HomeScreen> {
               title: const Text('Profile'),
               onTap: () {
                 Navigator.pop(context); // Close the drawer
-                Navigator.pushNamed(context, '/profile');
+                Navigator.pushNamed(context, '/profile'); // Navigates to a separate screen
               },
             ),
             ListTile(
@@ -283,7 +447,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      body: _homeContentView(), // Home screen only shows the welcome message
+      // This is the core for persistent content switching.
+      // IndexedStack only shows one child at a time based on _selectedIndex.
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _widgetOptions,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -292,16 +461,16 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.library_books),
-            label: 'Resources',
+            label: 'Academic',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.event),
-            label: 'Events',
+            label: 'Event',
           ),
         ],
-        currentIndex: _selectedIndex,
+        currentIndex: _selectedIndex, // Highlights the currently selected tab
         selectedItemColor: Colors.blue.shade700,
-        onTap: _onItemTapped,
+        onTap: _onItemTapped, // Calls our method to update _selectedIndex
       ),
     );
   }
