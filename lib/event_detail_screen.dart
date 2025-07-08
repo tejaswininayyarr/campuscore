@@ -63,13 +63,13 @@ class EventDetailScreen extends StatelessWidget {
             tooltip: 'Delete Event',
           ),
           // You could also add an edit button here if you want to reuse AddEventScreen for editing
-          // IconButton(
-          //   icon: const Icon(Icons.edit),
-          //   onPressed: () {
-          //     Navigator.pushNamed(context, '/add_event', arguments: event);
-          //   },
-          //   tooltip: 'Edit Event',
-          // ),
+           IconButton(
+             icon: const Icon(Icons.edit),
+             onPressed: () {
+               Navigator.pushNamed(context, '/add_event', arguments: event);
+             },
+             tooltip: 'Edit Event',
+           ),
         ],
       ),
       body: SingleChildScrollView(
@@ -84,10 +84,10 @@ class EventDetailScreen extends StatelessWidget {
                   event.imageUrl,
                   fit: BoxFit.cover,
                   width: double.infinity,
-                  height: 200,
+                  height: 400,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
-                      height: 200,
+                      height: 10,
                       color: Colors.grey.shade300,
                       child: const Center(
                         child: Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
