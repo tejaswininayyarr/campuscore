@@ -2,9 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:image_picker/image_picker.dart'; // Import for image picking
-import 'dart:io'; // Required for File class
-import 'package:firebase_storage/firebase_storage.dart'; // Import for Firebase Storage
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
@@ -23,12 +23,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final ImagePicker _picker = ImagePicker(); // Instance of ImagePicker
+  final ImagePicker _picker = ImagePicker();
 
   User? _currentUser;
   bool _isLoading = true;
-  File? _pickedImage; // To hold the image file picked from the device temporarily
-  String? _profileImageUrl; // To hold the URL of the profile image from Firestore/Storage
+  File? _pickedImage;
+  String? _profileImageUrl;
 
   @override
   void initState() {
@@ -49,14 +49,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           _bioController.text = userData['bio'] ?? '';
           _majorController.text = userData['major'] ?? '';
           _batchController.text = userData['batch'] ?? '';
-          _profileImageUrl = userData['profileImageUrl']; // Load existing image URL
+          _profileImageUrl = userData['profileImageUrl'];
         }
       } catch (e) {
         print('Error loading user profile: $e');
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error loading profile: $e')),
-          );
+          // --- FIX 1: Use addPostFrameCallback to show SnackBar AFTER build is complete ---
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error loading profile: $e')),
+            );
+          });
         }
       }
     }
@@ -65,7 +68,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     });
   }
 
-  // Method to show a bottom sheet for image source selection (gallery or camera)
   Future<void> _pickImage() async {
     showModalBottomSheet(
       context: context,
@@ -78,7 +80,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 leading: const Icon(Icons.photo_library),
                 title: const Text('Photo Library'),
                 onTap: () {
-                  Navigator.pop(context); // Close the bottom sheet
+                  Navigator.pop(context);
                   _pickImageSource(ImageSource.gallery);
                 },
               ),
@@ -86,7 +88,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 leading: const Icon(Icons.camera_alt),
                 title: const Text('Camera'),
                 onTap: () {
-                  Navigator.pop(context); // Close the bottom sheet
+                  Navigator.pop(context);
                   _pickImageSource(ImageSource.camera);
                 },
               ),
@@ -97,31 +99,28 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  // Method to pick an image from the chosen source
   Future<void> _pickImageSource(ImageSource source) async {
-    // imageQuality: 80 compresses the image to 80% quality, reducing file size
     final XFile? pickedFile = await _picker.pickImage(source: source, imageQuality: 80);
     if (pickedFile != null) {
       setState(() {
-        _pickedImage = File(pickedFile.path); // Store the picked file
+        _pickedImage = File(pickedFile.path);
       });
     }
   }
 
-  // Method to upload the picked image to Firebase Storage
   Future<String?> _uploadProfileImage() async {
     if (_pickedImage == null || _currentUser == null) return null;
 
     final storageRef = FirebaseStorage.instance
         .ref()
-        .child('profile_pictures') // Top-level folder for profile pictures
-        .child(_currentUser!.uid) // Subfolder for the current user's UID
-        .child('${_currentUser!.uid}_profile.jpg'); // Filename (e.g., userUID_profile.jpg)
+        .child('profile_pictures')
+        .child(_currentUser!.uid)
+        .child('${_currentUser!.uid}_profile.jpg');
 
     try {
       UploadTask uploadTask = storageRef.putFile(_pickedImage!);
       TaskSnapshot snapshot = await uploadTask;
-      final downloadUrl = await snapshot.ref.getDownloadURL(); // Get the public URL of the uploaded image
+      final downloadUrl = await snapshot.ref.getDownloadURL();
       return downloadUrl;
     } on FirebaseException catch (e) {
       print('Firebase Storage Error: ${e.code} - ${e.message}');
@@ -148,24 +147,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         _isLoading = true;
       });
       try {
-        String? newImageUrl = _profileImageUrl; // Start with the existing image URL
+        String? newImageUrl = _profileImageUrl;
 
-        // If a new image was picked, upload it first
         if (_pickedImage != null) {
           newImageUrl = await _uploadProfileImage();
           if (newImageUrl == null) {
-            // If image upload failed, stop the profile update process
             setState(() {
               _isLoading = false;
             });
-            return; // Exit early if image upload failed
+            return;
           }
         }
 
-        // Update Firebase Auth profile display name (if needed)
         await _currentUser!.updateDisplayName(_nameController.text);
 
-        // Update Firestore document with all profile details and the new (or existing) image URL
         await _firestore.collection('users').doc(_currentUser!.uid).set(
           {
             'name': _nameController.text,
@@ -173,20 +168,18 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             'bio': _bioController.text,
             'major': _majorController.text,
             'batch': _batchController.text,
-            'profileImageUrl': newImageUrl, // Save the new or existing image URL
-            'lastUpdated': FieldValue.serverTimestamp(), // Timestamp of the last update
+            'profileImageUrl': newImageUrl,
+            'lastUpdated': FieldValue.serverTimestamp(),
           },
-          SetOptions(merge: true), // Use merge: true to only update specified fields
+          SetOptions(merge: true),
         );
 
-        // --- Profile updated successfully ---
-        // Removed the SnackBar from THIS screen.
-        // Navigating back to the home screen and passing a flag for the message.
+        // --- FIX 2: Instead of pushing a flag to '/home', directly show SnackBar and then pop ---
         if (mounted) {
-          Navigator.of(context).pushReplacementNamed(
-            '/home',
-            arguments: {'profileUpdated': true}, // Pass a flag to show success message on Home Screen
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Profile updated successfully!')),
           );
+          Navigator.of(context).pop(); // Go back to the previous screen (Home)
         }
       } catch (e) {
         print('Error updating profile: $e');
@@ -207,7 +200,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   @override
   void dispose() {
-    // Dispose all TextEditingControllers to prevent memory leaks
     _nameController.dispose();
     _emailController.dispose();
     _bioController.dispose();
@@ -225,7 +217,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         foregroundColor: Colors.white,
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator()) // Show loading indicator while loading data
+          ? const Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: Form(
@@ -239,26 +231,25 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           CircleAvatar(
                             radius: 60,
                             backgroundColor: Colors.blue.shade100,
-                            // Priority: 1. Picked Image (local file), 2. Network Image (from Firestore URL), 3. Default Icon
                             backgroundImage: _pickedImage != null
-                                ? FileImage(_pickedImage!) as ImageProvider<Object> // Use FileImage for local file
+                                ? FileImage(_pickedImage!) as ImageProvider<Object>
                                 : (_profileImageUrl != null
-                                    ? NetworkImage(_profileImageUrl!) as ImageProvider<Object> // Use NetworkImage for URL
-                                    : null), // No background image if neither
+                                    ? NetworkImage(_profileImageUrl!) as ImageProvider<Object>
+                                    : null),
                             child: _pickedImage == null && _profileImageUrl == null
                                 ? Icon(
                                     Icons.person,
                                     size: 80,
                                     color: Colors.blue.shade700,
                                   )
-                                : null, // Hide the default icon if an image is present
+                                : null,
                           ),
                           Positioned(
                             bottom: 0,
                             right: 0,
                             child: IconButton(
                               icon: const Icon(Icons.camera_alt, color: Colors.blue, size: 28),
-                              onPressed: _pickImage, // Call the image picker method
+                              onPressed: _pickImage,
                             ),
                           ),
                         ],
@@ -270,7 +261,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       decoration: const InputDecoration(
                         labelText: 'Full Name',
                         prefixIcon: Icon(Icons.person_outline),
-                        border: OutlineInputBorder(), // Add border for better aesthetics
+                        border: OutlineInputBorder(),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -286,10 +277,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         labelText: 'Email',
                         prefixIcon: Icon(Icons.email),
                         filled: true,
-                        fillColor: Color.fromARGB(255, 198, 108, 108), // Changed to a standard light gray
+                        fillColor: Color.fromARGB(255, 230, 230, 230), // Changed to a standard light gray
                         border: OutlineInputBorder(),
                       ),
-                      readOnly: true, // Email is typically read-only if managed by Firebase Auth
+                      readOnly: true,
                     ),
                     const SizedBox(height: 20),
                     TextFormField(
@@ -326,8 +317,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     ElevatedButton(
                       onPressed: _updateUserProfile,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue.shade600, // Custom button color
-                        foregroundColor: Colors.white, // Text color
+                        backgroundColor: Colors.blue.shade600,
+                        foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
