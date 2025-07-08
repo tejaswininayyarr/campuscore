@@ -8,7 +8,8 @@ import 'auth_service.dart'; // Make sure this path is correct
 // Import the content widgets for your bottom nav tabs.
 // These screens (AcademicResourcesScreen, CampusEventsScreen) should NOT have their own Scaffold or AppBar.
 import 'academic.dart'; // Ensure path is correct
-import 'event_screen.dart';       // Ensure path is correct
+import 'event_screen.dart'; 
+import 'add_event_screen.dart';    // Ensure path is correct
 
 // Import other screens accessible via the Drawer (these will still be full Scaffolds)
 
@@ -472,6 +473,18 @@ class _HomeScreenState extends State<HomeScreen> {
         selectedItemColor: Colors.blue.shade700,
         onTap: _onItemTapped, // Calls our method to update _selectedIndex
       ),
+            // NEW: Floating Action Button
+      floatingActionButton: _selectedIndex == 2 // Show FAB only on the 'Event' tab
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/add_event'); // Navigate to AddEventScreen
+              },
+              backgroundColor: Colors.blue.shade700,
+              foregroundColor: Colors.white,
+              child: const Icon(Icons.add),
+            )
+          : null, // Don't show FAB on other tabs
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }

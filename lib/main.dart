@@ -1,4 +1,5 @@
 // lib/main.dart
+import 'package:collage/models/event.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -23,8 +24,9 @@ import 'mentorship_screen.dart'; // Placeholder screen
 import 'alumni_screen.dart'; // Placeholder screen
 import 'faculty_screen.dart'; // Placeholder screen
 import 'guidance_screen.dart'; // Placeholder screen
-
-
+import 'event_detail_screen.dart'; // Import the event detail screen
+import 'event_screen.dart';
+import 'add_event_screen.dart'; 
 void main() async {
   // Ensure Flutter widgets are initialized before Firebase. This is crucial.
   WidgetsFlutterBinding.ensureInitialized();
@@ -83,12 +85,11 @@ class MyApp extends StatelessWidget {
         '/alumni': (context) =>  AlumniScreen(),
         '/faculty': (context) => FacultyScreen(),
         '/guidance': (context) => GuidanceScreen(),
-        '/academic_resources': (context) =>  AcademicResourcesScreen(),
-        '/campus_events': (context) =>  CampusEventsScreen(),
+        
       },
       // You can also define an onGenerateRoute for more dynamic routing,
       // especially for passing arguments to screens like AddEditGoalScreen
-      onGenerateRoute: (settings) {
+       onGenerateRoute: (settings) {
         if (settings.name == '/edit_goal') {
           final Goal? goal = settings.arguments as Goal?;
           return MaterialPageRoute(
@@ -96,8 +97,23 @@ class MyApp extends StatelessWidget {
               return AddEditGoalScreen(goal: goal);
             },
           );
+        } else if (settings.name == '/event_detail') {
+          final Event event = settings.arguments as Event;
+          return MaterialPageRoute(
+            builder: (context) {
+              return EventDetailScreen(event: event);
+            },
+          );
+        } else if (settings.name == '/add_event') { // NEW: Handle AddEventScreen route
+          // No arguments needed for adding a new event, but could be passed for editing
+          final Event? event = settings.arguments as Event?; // For potential future editing
+          return MaterialPageRoute(
+            builder: (context) {
+              return AddEventScreen(event: event);
+            },
+          );
         }
-        return null; // Let the app handle other unknown routes
+        return null;
       },
     );
   }
