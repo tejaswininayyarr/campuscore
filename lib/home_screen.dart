@@ -12,9 +12,6 @@ import 'event_screen.dart';
 import 'add_event_screen.dart';    // Ensure path is correct
 
 // Import other screens accessible via the Drawer (these will still be full Scaffolds)
-
-
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -91,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      const AcademicResourcesScreen(), // Content for the "Academic" tab (from its separate file)
+      const AcademicScreen(), // Content for the "Academic" tab (from its separate file)
       const CampusEventsScreen(),       // Content for the "Event" tab (from its separate file)
     ];
   }

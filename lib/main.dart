@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'models/academic_resources.dart';
 // Import the generated Firebase options file. This file is created by
 // `flutterfire configure`.
 // If you see an error here, re-run `flutterfire configure` in your
