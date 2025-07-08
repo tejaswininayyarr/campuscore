@@ -1,13 +1,52 @@
-// lib/screens/event_detail_screen.dart
-
 import 'package:flutter/material.dart';
-import 'models/event.dart'; // IMPORTANT: Make sure this import path is correct
-import 'package:intl/intl.dart'; // IMPORTANT: Make sure this import is present
+import 'models/event.dart';
+import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 
 class EventDetailScreen extends StatelessWidget {
   final Event event;
 
   const EventDetailScreen({super.key, required this.event});
+
+  // Method to show confirmation dialog and delete event
+  Future<void> _confirmAndDelete(BuildContext context) async {
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Delete Event'),
+          content: Text('Are you sure you want to delete "${event.title}"? This cannot be undone.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false), // Dismiss and return false
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true), // Dismiss and return true
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirm == true) {
+      // User confirmed deletion
+      try {
+        await FirebaseFirestore.instance.collection('events').doc(event.id).delete();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Event deleted successfully!')),
+        );
+        // After deletion, pop back to the previous screen (CampusEventsScreen)
+        Navigator.of(context).pop();
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete event: $e')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +55,22 @@ class EventDetailScreen extends StatelessWidget {
         title: Text(event.title, style: const TextStyle(color: Colors.white)),
         backgroundColor: Colors.blue.shade700,
         iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          // Delete Button
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: () => _confirmAndDelete(context), // Call the delete method
+            tooltip: 'Delete Event',
+          ),
+          // You could also add an edit button here if you want to reuse AddEventScreen for editing
+          // IconButton(
+          //   icon: const Icon(Icons.edit),
+          //   onPressed: () {
+          //     Navigator.pushNamed(context, '/add_event', arguments: event);
+          //   },
+          //   tooltip: 'Edit Event',
+          // ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
