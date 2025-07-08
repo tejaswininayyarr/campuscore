@@ -1,0 +1,39 @@
+// lib/campus_events_screen.dart
+import 'package:flutter/material.dart';
+
+class CampusEventsScreen extends StatelessWidget {
+  const CampusEventsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Campus Events', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.blue.shade700,
+      ),
+      body: const Center(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.event, size: 80, color: Colors.blue),
+              SizedBox(height: 20),
+              Text(
+                'Stay updated with all the exciting events happening on campus!',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 18, color: Colors.black87),
+              ),
+              SizedBox(height: 40),
+              // You can add a list of events here later
+              Text(
+                'Event listings coming soon!',
+                style: TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
