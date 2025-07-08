@@ -1,17 +1,16 @@
+//lib/screens/campus_events_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flip_card/flip_card.dart'; // Import the flip_card package
-import '/models/event.dart'; // Import your Event model
-import 'event_detail_screen.dart'; // Import the detail screen
-import 'package:intl/intl.dart'; // For date formatting
+import 'package:flip_card/flip_card.dart'; // Keep this import
+import 'models/event.dart';
+import 'package:intl/intl.dart';
 
 class CampusEventsScreen extends StatelessWidget {
   const CampusEventsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // This screen does not have its own Scaffold or AppBar,
-    // as it's part of the HomeScreen's IndexedStack.
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('events').orderBy('date', descending: false).snapshots(),
       builder: (context, snapshot) {
@@ -47,7 +46,9 @@ class CampusEventsScreen extends StatelessWidget {
             return Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
               child: FlipCard(
-                direction: FlipDirection.HORIZONTAL, // default
+                direction: FlipDirection.HORIZONTAL,
+                // By default, flipOnTap is true, meaning tapping anywhere on the card will flip it.
+                // We remove the InkWell from the back side to prevent navigation on flip.
                 front: _buildEventCardFront(event),
                 back: _buildEventCardBack(context, event), // Pass context to navigate
               ),
@@ -62,11 +63,10 @@ class CampusEventsScreen extends StatelessWidget {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      clipBehavior: Clip.antiAlias, // Clip children to the rounded corners
+      clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Event Poster Image
           Image.network(
             event.imageUrl,
             height: 180,
@@ -81,7 +81,6 @@ class CampusEventsScreen extends StatelessWidget {
               );
             },
           ),
-          // Event Title and Date
           Padding(
             padding: const EdgeInsets.all(12.0),
             child: Column(
@@ -98,7 +97,7 @@ class CampusEventsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  DateFormat('MMM d, yyyy - h:mm a').format(event.date.add(Duration(hours: int.parse(event.time.split(':')[0]), minutes: int.parse(event.time.split(':')[1].split(' ')[0])))), // Basic time parsing
+                  DateFormat('MMM d,yyyy - h:mm a').format(event.date),
                   style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
                 ),
               ],
@@ -109,60 +108,61 @@ class CampusEventsScreen extends StatelessWidget {
     );
   }
 
+  // Modified back of the card to include a 'View Details' button
   Widget _buildEventCardBack(BuildContext context, Event event) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       color: Colors.blue.shade50,
-      child: InkWell( // Use InkWell for tap effect on the back
-        onTap: () {
-          // Navigate to the detail screen when the back of the card is tapped
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => EventDetailScreen(event: event),
+      child: Padding( // Removed InkWell from here so card flips on tap anywhere, not just for navigation
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              event.title,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue,
+              ),
+              textAlign: TextAlign.center,
             ),
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
-            children: [
-              Text(
-                event.title,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Date: ${DateFormat('MMM d, yyyy').format(event.date)}',
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                'Time: ${event.time}',
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                'Location: ${event.location}',
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 15),
-              Center(
-                child: Text(
-                  'Tap for more details!',
-                  style: TextStyle(fontSize: 14, color: Colors.blue.shade800, fontWeight: FontWeight.w600),
+            const SizedBox(height: 10),
+            Text(
+              'Date: ${DateFormat('MMM d,yyyy').format(event.date)}',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              'Time: ${event.time}',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              'Location: ${event.location}',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 15),
+            Center(
+              child: ElevatedButton.icon( // Added a dedicated button for details
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    '/event_detail',
+                    arguments: event,
+                  );
+                },
+                icon: const Icon(Icons.info_outline),
+                label: const Text('View Details'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue.shade700,
+                  foregroundColor: Colors.white,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

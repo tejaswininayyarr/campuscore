@@ -1,7 +1,9 @@
+// lib/screens/add_event_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart'; // For date formatting
-import 'models/event.dart'; // Import your Event model
+import 'package:intl/intl.dart';
+import '/models/event.dart';
 
 class AddEventScreen extends StatefulWidget {
   final Event? event; // Optional: for editing existing events
@@ -16,7 +18,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _imageUrlController = TextEditingController();
+  final TextEditingController _imageUrlController = TextEditingController(); // Re-added
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _organizerController = TextEditingController();
   final TextEditingController _contactInfoController = TextEditingController();
@@ -33,7 +35,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
       // If editing an existing event, pre-fill fields
       _titleController.text = widget.event!.title;
       _descriptionController.text = widget.event!.description;
-      _imageUrlController.text = widget.event!.imageUrl;
+      _imageUrlController.text = widget.event!.imageUrl; // Re-added
       _locationController.text = widget.event!.location;
       _organizerController.text = widget.event!.organizer;
       _contactInfoController.text = widget.event!.contactInfo;
@@ -46,7 +48,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
-    _imageUrlController.dispose();
+    _imageUrlController.dispose(); // Re-added
     _locationController.dispose();
     _organizerController.dispose();
     _contactInfoController.dispose();
@@ -97,7 +99,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
         id: widget.event?.id ?? '', // ID is empty for new events, Firestore will assign
         title: _titleController.text,
         description: _descriptionController.text,
-        imageUrl: _imageUrlController.text.isNotEmpty ? _imageUrlController.text : 'https://via.placeholder.com/150',
+        imageUrl: _imageUrlController.text.isNotEmpty ? _imageUrlController.text : 'https://via.placeholder.com/150', // Use text field value
         date: eventDateTime,
         time: DateFormat('h:mm a').format(eventDateTime), // Format for display
         location: _locationController.text,
@@ -172,6 +174,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
                       },
                     ),
                     const SizedBox(height: 16),
+                    // Image URL Text Field
                     TextFormField(
                       controller: _imageUrlController,
                       decoration: const InputDecoration(
@@ -181,6 +184,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
                       keyboardType: TextInputType.url,
                     ),
                     const SizedBox(height: 16),
+                    // End Image URL Text Field
                     Row(
                       children: [
                         Expanded(
