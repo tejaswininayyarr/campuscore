@@ -8,10 +8,18 @@ import 'auth_service.dart'; // Make sure this path is correct
 // Import the content widgets for your bottom nav tabs.
 // These screens (AcademicResourcesScreen, CampusEventsScreen) should NOT have their own Scaffold or AppBar.
 import 'academic.dart'; // Ensure path is correct
-import 'event_screen.dart'; 
-import 'add_event_screen.dart';    // Ensure path is correct
+import 'event_screen.dart';
+import 'add_event_screen.dart'; // Ensure path is correct
 
 // Import other screens accessible via the Drawer (these will still be full Scaffolds)
+import 'user_profile_screen.dart'; // Ensure path is correct
+import 'goal_task_manager_screen.dart'; // Ensure path is correct
+// import 'mentorship_screen.dart'; // REMOVED: Mentorship screen import
+import 'alumni_screen.dart'; // Ensure path is correct
+import 'faculty_screen.dart'; // Ensure path is correct
+import 'guidance_screen.dart'; // Ensure path is correct
+
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -32,8 +40,8 @@ class _HomeScreenState extends State<HomeScreen> {
   // Titles for the AppBar that will change based on the selected tab.
   final List<String> _appBarTitles = const [
     'JIMS - College Connect',      // Title for 'Home' tab
-    'Academic Resources',   // Title for 'Academic' tab
-    'Campus Events',        // Title for 'Event' tab
+    'Academic Resources',  // Title for 'Academic' tab
+    'Campus Events',         // Title for 'Event' tab
   ];
 
   // Flag to ensure the profile update SnackBar is shown only once per screen load.
@@ -107,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          
+
           // College Header Section
           Container(
             width: double.infinity,
@@ -143,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          
+
           // College Info Section
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -168,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                
+
                 // Contact Info
                 Container(
                   padding: const EdgeInsets.all(15),
@@ -193,9 +201,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 30),
-                
+
                 // Programs Section
                 const Text(
                   'Programs Offered',
@@ -206,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                
+
                 // Program Cards
                 Row(
                   children: [
@@ -262,9 +270,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 30),
-                
+
                 // Clubs Section
                 const Text(
                   'Our Clubs',
@@ -286,10 +294,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          
+
           // Clubs Carousel
           const ClubCarousel(),
-          
+
           const SizedBox(height: 30),
         ],
       ),
@@ -430,14 +438,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.pushNamed(context, '/goals');
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.group),
-              title: const Text('Mentorship'),
-              onTap: () {
-                Navigator.pop(context); // Close the drawer
-                Navigator.pushNamed(context, '/mentorship');
-              },
-            ),
+            // REMOVED: Mentorship ListTile
+            // ListTile(
+            //   leading: const Icon(Icons.group),
+            //   title: const Text('Mentorship'),
+            //   onTap: () {
+            //     Navigator.pop(context); // Close the drawer
+            //     Navigator.pushNamed(context, '/mentorship');
+            //   },
+            // ),
             ListTile(
               leading: const Icon(Icons.people_alt),
               title: const Text('Alumni'),
@@ -503,7 +512,7 @@ class _HomeScreenState extends State<HomeScreen> {
         selectedItemColor: Colors.blue.shade700,
         onTap: _onItemTapped, // Calls our method to update _selectedIndex
       ),
-            // NEW: Floating Action Button
+      // NEW: Floating Action Button
       floatingActionButton: _selectedIndex == 2 // Show FAB only on the 'Event' tab
           ? FloatingActionButton(
               onPressed: () {
@@ -518,6 +527,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
 // Updated Club Carousel Widget with fixes
 class ClubCarousel extends StatefulWidget {
   const ClubCarousel({super.key});
@@ -529,7 +539,7 @@ class ClubCarousel extends StatefulWidget {
 class _ClubCarouselState extends State<ClubCarousel> {
   final PageController pageController = PageController();
   int currentIndex = 0;
-  
+
   final List<Map<String, String>> clubs = [
     {
       'name': 'Economics Club',
@@ -573,7 +583,7 @@ class _ClubCarouselState extends State<ClubCarousel> {
     hexColor = hexColor.replaceAll('#', '');
     return Color(int.parse('FF$hexColor', radix: 16));
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -600,9 +610,9 @@ class _ClubCarouselState extends State<ClubCarousel> {
             },
           ),
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Page Indicators
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -614,17 +624,17 @@ class _ClubCarouselState extends State<ClubCarousel> {
               width: currentIndex == index ? 20 : 8,
               height: 8,
               decoration: BoxDecoration(
-                color: currentIndex == index 
-                    ? Colors.blue.shade700 
+                color: currentIndex == index
+                    ? Colors.blue.shade700
                     : Colors.grey.shade300,
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
           ),
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Navigation Buttons
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -673,13 +683,13 @@ class _ClubCarouselState extends State<ClubCarousel> {
 class FlipCard extends StatefulWidget {
   final Map<String, String> club;
   final Color primaryColor;
-  
+
   const FlipCard({
-    super.key, 
+    super.key,
     required this.club,
     required this.primaryColor,
   });
-  
+
   @override
   State<FlipCard> createState() => _FlipCardState();
 }
@@ -688,7 +698,7 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
   late AnimationController animationController;
   late Animation<double> animation;
   bool isFlipped = false;
-  
+
   @override
   void initState() {
     super.initState();
@@ -704,13 +714,13 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
       curve: Curves.easeInOut,
     ));
   }
-  
+
   @override
   void dispose() {
     animationController.dispose();
     super.dispose();
   }
-  
+
   void flipCard() {
     if (!isFlipped) {
       animationController.forward();
@@ -721,7 +731,7 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
       isFlipped = !isFlipped;
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -730,7 +740,7 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
         animation: animation,
         builder: (context, child) {
           final isShowingFront = animation.value < 0.5;
-          
+
           return Transform(
             alignment: Alignment.center,
             transform: Matrix4.identity()
@@ -759,7 +769,7 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
       ),
     );
   }
-  
+
   Widget _buildFrontCard() {
     return Container(
       width: double.infinity,
@@ -801,7 +811,7 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
               ),
             ),
           ),
-          
+
           // Content
           Padding(
             padding: const EdgeInsets.all(20),
@@ -809,7 +819,7 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Spacer(),
-                
+
                 // Club Icon
                 Container(
                   width: 60,
@@ -824,9 +834,9 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
                     color: Colors.white,
                   ),
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Club Name
                 Text(
                   widget.club['name']!,
@@ -843,9 +853,9 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 8),
-                
+
                 // Description
                 Text(
                   widget.club['description']!,
@@ -862,9 +872,9 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Tap hint
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -888,7 +898,7 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
       ),
     );
   }
-  
+
   Widget _buildBackCard() {
     return Transform(
       alignment: Alignment.center,
@@ -933,9 +943,9 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // Activities Header
               Text(
                 'Activities:',
@@ -945,39 +955,15 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
                   color: Colors.grey.shade800,
                 ),
               ),
-              
-              const SizedBox(height: 12),
-              
-              // Activities List
+              const SizedBox(height: 8),
               Expanded(
                 child: SingleChildScrollView(
                   child: Text(
                     widget.club['activities']!,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14,
-                      color: Colors.grey.shade600,
-                      height: 1.6,
-                    ),
-                  ),
-                ),
-              ),
-              
-              const SizedBox(height: 16),
-              
-              // Back hint
-              Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Text(
-                    'Tap to go back',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.grey.shade600,
-                      fontWeight: FontWeight.w500,
+                      color: Colors.black87,
+                      height: 1.5,
                     ),
                   ),
                 ),
@@ -988,25 +974,24 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
       ),
     );
   }
-  
+
   IconData _getClubIcon(String clubName) {
-    switch (clubName.toLowerCase()) {
-      case 'economics club':
-        return Icons.trending_up;
-      case 'tekqbe club':
+    switch (clubName) {
+      case 'Economics Club':
+        return Icons.currency_exchange;
+      case 'Tekqbe Club':
         return Icons.computer;
-      case 'gender championship club':
+      case 'Gender Championship Club':
         return Icons.people;
-      case 'sports club':
-        return Icons.sports_football;
-      case 'patriotic club':
+      case 'Sports Club':
+        return Icons.sports_soccer;
+      case 'Patriotic Club':
         return Icons.flag;
-      case 'cultural club':
-        return Icons.theater_comedy;
+      case 'Cultural Club':
+        return Icons.palette;
       default:
         return Icons.group;
     }
   }
 }
-
 

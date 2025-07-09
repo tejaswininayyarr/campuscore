@@ -1,119 +1,149 @@
 // lib/main.dart
-import 'package:collage/models/event.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'models/academic_resources.dart';
-// Import the generated Firebase options file. This file is created by
-// `flutterfire configure`.
-// If you see an error here, re-run `flutterfire configure` in your
-// project root.
+
+// Import the generated Firebase options file. This file is created by `flutterfire configure`.
 import 'firebase_options.dart';
+
 // Import custom services and screens
-import 'event_screen.dart';
-import 'academic.dart';
-import 'auth_service.dart'; // Ensure this path is correct based on your project name
-import 'login_screen.dart'; // Ensure this path is correct
-import 'signup_screen.dart'; // Ensure this path is correct
+import 'auth_service.dart';
+import 'login_screen.dart';
+import 'signup_screen.dart';
 import 'home_screen.dart';
 import 'user_profile_screen.dart';
 import 'goal_task_manager_screen.dart';
 import 'add_edit_goal_screen.dart';
-import 'goal_model.dart'; // <--- IMPORTANT: Ensure this is imported for Goal type recognition
-import 'mentorship_screen.dart'; // Placeholder screen
-import 'alumni_screen.dart'; // Placeholder screen
-import 'faculty_screen.dart'; // Placeholder screen
-import 'guidance_screen.dart'; // Placeholder screen
-import 'event_detail_screen.dart'; // Import the event detail screen
-import 'add_event_screen.dart'; 
+import 'goal_model.dart';
+// import 'mentorship_screen.dart'; // REMOVED: Mentorship screen import
+import 'alumni_screen.dart';
+import 'faculty_screen.dart';
+import 'guidance_screen.dart';
+import 'academic.dart';
+import 'event_screen.dart';
+import 'add_event_screen.dart';
+
 void main() async {
-  // Ensure Flutter widgets are initialized before Firebase. This is crucial.
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase using the generated options for the current platform.
-  // This must be called before using any Firebase services.
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    print('Firebase initialized successfully!'); // For debugging, consider removing in prod
+    print('Firebase initialized successfully!');
   } catch (e) {
     print('Error initializing Firebase: $e');
-    // Consider showing an error dialog or handling this more gracefully in a real app.
   }
 
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'College Connect',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      // Define your routes
-      initialRoute: '/', // Or '/login' if you want login to be the first screen
-      routes: {
-        // Updated to use the correct class names directly without 'new' or 'const' if not needed
-        '/': (context) => StreamBuilder<User?>(
-              stream: FirebaseAuth.instance.authStateChanges(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Scaffold(
-                    body: Center(child: CircularProgressIndicator()),
-                  );
-                }
-                if (snapshot.hasData) {
-                  return HomeScreen(); // User is logged in
-                }
-                return LoginScreen(); // User is not logged in, show login
-              },
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
-        '/login': (context) => LoginScreen(), // Correctly referencing LoginScreen
-        '/signup': (context) => SignupScreen(), // Correctly referencing SignupScreen
-        '/home': (context) =>  HomeScreen(),
-        '/profile': (context) =>  UserProfileScreen(),
-        '/goals': (context) =>  GoalTaskManagerScreen(),
-        '/add_goal': (context) =>  AddEditGoalScreen(),
-        '/mentorship': (context) =>  MentorshipScreen(),
-        '/alumni': (context) =>  AlumniScreen(),
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+            textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.blue, width: 2),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.grey.shade400),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.red),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.red, width: 2),
+          ),
+          contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        ),
+        cardTheme: CardThemeData(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 4,
+          margin: EdgeInsets.all(8),
+        ),
+        appBarTheme: AppBarTheme( // Added for consistent AppBar styling
+          color: Colors.blue.shade700,
+          foregroundColor: Colors.white,
+        ),
+      ),
+      initialRoute: FirebaseAuth.instance.currentUser == null ? '/login' : '/home',
+      routes: {
+        '/login': (context) => LoginScreen(),
+        '/signup': (context) => SignupScreen(),
+        '/home': (context) => HomeScreen(),
+        '/profile': (context) => UserProfileScreen(),
+        '/goals': (context) => GoalTaskManagerScreen(),
+        '/add_edit_goal': (context) {
+          final Goal? goal = ModalRoute.of(context)?.settings.arguments as Goal?;
+          return AddEditGoalScreen(goal: goal);
+        },
+        // '/mentorship': (context) => MentorshipScreen(), // REMOVED: Mentorship screen route
+        '/alumni': (context) => AlumniScreen(),
         '/faculty': (context) => FacultyScreen(),
         '/guidance': (context) => GuidanceScreen(),
-        
+        '/add_event': (context) => AddEventScreen(),
       },
-      // You can also define an onGenerateRoute for more dynamic routing,
-      // especially for passing arguments to screens like AddEditGoalScreen
-       onGenerateRoute: (settings) {
-        if (settings.name == '/edit_goal') {
-          final Goal? goal = settings.arguments as Goal?;
-          return MaterialPageRoute(
-            builder: (context) {
-              return AddEditGoalScreen(goal: goal);
-            },
+    );
+  }
+}
+
+class AuthWrapper extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    print('AuthWrapper building...');
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        print('StreamBuilder connectionState: ${snapshot.connectionState}');
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          print('AuthWrapper: ConnectionState.waiting - Showing CircularProgressIndicator');
+          return Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
           );
-        } else if (settings.name == '/event_detail') {
-          final Event event = settings.arguments as Event;
-          return MaterialPageRoute(
-            builder: (context) {
-              return EventDetailScreen(event: event);
-            },
+        } else if (snapshot.hasError) {
+          print('AuthWrapper: Stream has error: ${snapshot.error}');
+          return Scaffold(
+            body: Center(
+              child: Text(
+                'Error: ${snapshot.error}',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
           );
-        } else if (settings.name == '/add_event') { // NEW: Handle AddEventScreen route
-          // No arguments needed for adding a new event, but could be passed for editing
-          final Event? event = settings.arguments as Event?; // For potential future editing
-          return MaterialPageRoute(
-            builder: (context) {
-              return AddEventScreen(event: event);
-            },
-          );
+        } else if (snapshot.hasData) {
+          print('AuthWrapper: User is logged in (${snapshot.data?.email}) - Navigating to HomeScreen');
+          return HomeScreen();
+        } else {
+          print('AuthWrapper: User is NOT logged in - Navigating to LoginScreen');
+          return LoginScreen();
         }
-        return null;
       },
     );
   }
