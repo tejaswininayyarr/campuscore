@@ -26,7 +26,6 @@ import 'alumni_screen.dart'; // Placeholder screen
 import 'faculty_screen.dart'; // Placeholder screen
 import 'guidance_screen.dart'; // Placeholder screen
 import 'event_detail_screen.dart'; // Import the event detail screen
-import 'event_screen.dart';
 import 'add_event_screen.dart'; 
 void main() async {
   // Ensure Flutter widgets are initialized before Firebase. This is crucial.
