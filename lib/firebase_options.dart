@@ -23,10 +23,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
         return macos;
       case TargetPlatform.windows:
@@ -53,11 +50,11 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBk_JrF6v2rBjVbOqdFLxwtMfE_v8Mx-ks',
-    appId: '1:1071654158058:android:d3c81d33092fa3250a2193',
-    messagingSenderId: '1071654158058',
-    projectId: 'project-5b401',
-    storageBucket: 'project-5b401.firebasestorage.app',
+    apiKey: 'AIzaSyCF5gbyFglRqprUm_DD5WT4gWIpedu6xIM',
+    appId: '1:45228980126:android:beb0fb2cb01604db19088f',
+    messagingSenderId: '45228980126',
+    projectId: 'career-55076',
+    storageBucket: 'career-55076.firebasestorage.app',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -76,6 +73,15 @@ class DefaultFirebaseOptions {
     projectId: 'career-55076',
     authDomain: 'career-55076.firebaseapp.com',
     storageBucket: 'career-55076.firebasestorage.app',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyCnTsiLWH2pAXoYpU_JaO_CUDnbP6fV_38',
+    appId: '1:45228980126:ios:3f024100e5c6ffa319088f',
+    messagingSenderId: '45228980126',
+    projectId: 'career-55076',
+    storageBucket: 'career-55076.firebasestorage.app',
+    iosBundleId: 'com.example.collage',
   );
 
 }
