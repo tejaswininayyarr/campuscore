@@ -1,39 +1,101 @@
 // Placeholder screen for the Faculty Information feature. 
 import 'package:flutter/material.dart'; 
- 
+import 'models/faculty_model.dart'; 
 class FacultyScreen extends StatelessWidget { 
-  @override 
-  Widget build(BuildContext context) { 
-    return Scaffold( 
-      appBar: AppBar( 
-        title: Text('Faculty Information', style: TextStyle(color: Colors.white)), 
-        backgroundColor: Colors.blue.shade700, 
-        elevation: 0, 
-        centerTitle: true, 
-      ), 
-      body: Center( 
-        child: Padding( 
-          padding: const EdgeInsets.all(24.0), 
-          child: Column( 
-            mainAxisAlignment: MainAxisAlignment.center, 
-            children: [ 
-              Icon(Icons.person_pin, size: 80, color: Colors.blue.shade300), 
-              SizedBox(height: 20), 
-              Text( 
-                'Faculty profiles will be available soon!', 
-                textAlign: TextAlign.center, 
-                style: TextStyle(fontSize: 22, fontWeight:FontWeight.bold, color: Colors.blue.shade800), 
-              ), 
-              SizedBox(height: 10), 
-              Text( 
-                'Find information about your professors, their research, and office hours.', 
-                textAlign: TextAlign.center, 
-                style: TextStyle(fontSize: 16, color: Colors.grey.shade600), 
-              ), 
-            ], 
-          ), 
-        ), 
-      ), 
-    ); 
-  } 
-} 
+  final List<Faculty> demoFacultyData = [
+    Faculty(
+      name: 'Dr. A. Sharma',
+      department: 'Computer Science',
+      role: 'Professor',
+      yearsAtUniversity: '15+ years',
+    ),
+    Faculty(
+      name: 'Prof. B. Singh',
+      department: 'Liberal Arts',
+      role: 'Associate Professor',
+      yearsAtUniversity: '8 years',
+    ),
+    Faculty(
+      name: 'Ms. C. Patel',
+      department: 'Business School',
+      role: 'Lecturer',
+      yearsAtUniversity: '3 years',
+    ),
+    Faculty(
+      name: 'Dr. D. Gupta',
+      department: 'Electrical Engineering',
+      role: 'Department Head',
+      yearsAtUniversity: '20+ years',
+    ),
+    Faculty(
+      name: 'Prof. E. Kumar',
+      department: 'Physics',
+      role: 'Assistant Professor',
+      yearsAtUniversity: '5 years',
+    ),
+    Faculty(
+      name: 'Dr. F. Rao',
+      department: 'Biotechnology',
+      role: 'Professor',
+      yearsAtUniversity: '12 years',
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Faculty Information', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.blue.shade700,
+        elevation: 0,
+        centerTitle: true,
+      ),
+      body: ListView.builder(
+        padding: const EdgeInsets.all(16.0),
+        itemCount: demoFacultyData.length,
+        itemBuilder: (context, index) {
+          final faculty = demoFacultyData[index];
+          return Card(
+            elevation: 6,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            margin: EdgeInsets.symmetric(vertical: 8),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    faculty.name,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade900,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Department: ${faculty.department}',
+                    style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Role: ${faculty.role}',
+                    style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
+                  ),
+                  if (faculty.yearsAtUniversity != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4.0),
+                      child: Text(
+                        'Years at University: ${faculty.yearsAtUniversity}',
+                        style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
