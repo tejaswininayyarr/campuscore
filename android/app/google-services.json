@@ -1,26 +1,36 @@
 {
   "project_info": {
-    "project_number": "45228980126",
-    "project_id": "career-55076",
-    "storage_bucket": "career-55076.firebasestorage.app"
+    "project_number": "1071654158058",
+    "project_id": "project-5b401",
+    "storage_bucket": "project-5b401.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:45228980126:android:beb0fb2cb01604db19088f",
+        "mobilesdk_app_id": "1:1071654158058:android:d3c81d33092fa3250a2193",
         "android_client_info": {
           "package_name": "com.example.collage"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1071654158058-0dca3ql7r06gju03u3dvv11qjneqkcbn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyCF5gbyFglRqprUm_DD5WT4gWIpedu6xIM"
+          "current_key": "AIzaSyBk_JrF6v2rBjVbOqdFLxwtMfE_v8Mx-ks"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1071654158058-0dca3ql7r06gju03u3dvv11qjneqkcbn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
