@@ -444,7 +444,6 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () {
                 Navigator.pop(context); // Close the drawer
                 Navigator.pushNamed(context, '/alumni');
-                _showSnackBar(context, 'Alumni Network feature coming soon!');
               },
             ),
             ListTile(
@@ -453,7 +452,6 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () {
                 Navigator.pop(context); // Close the drawer
                 Navigator.pushNamed(context, '/faculty');
-                _showSnackBar(context, 'Faculty Information feature coming soon!');
               },
             ),
             ListTile(
