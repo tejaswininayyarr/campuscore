@@ -2,14 +2,16 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:intl/intl.dart'; // Make sure you have intl: ^0.18.1 (or latest) in your pubspec.yaml
-import 'models/academic_resources.dart'; // Corrected import path
+import 'package:intl/intl.dart';
+import 'models/academic_resources.dart'; // Make sure this path is correct
 
 class AcademicScreen extends StatefulWidget {
   const AcademicScreen({super.key});
+
   @override
   State<AcademicScreen> createState() => _AcademicScreenState();
 }
+
 class _AcademicScreenState extends State<AcademicScreen> {
   String? _selectedCategory;
   String? _selectedCourse;
@@ -19,8 +21,15 @@ class _AcademicScreenState extends State<AcademicScreen> {
   final List<String> _courses = ['BCA', 'BBA', 'BA(Eco)'];
   final List<String> _semesters = [
     '1st Semester', '2nd Semester', '3rd Semester', '4th Semester',
-    '5th Semester', '6th Semester', 
-  ]; 
+    '5th Semester', '6th Semester',
+  ];
+
+  // Define some custom colors for consistency
+  final Color _primaryBlue = Colors.blue.shade700;
+  final Color _accentGreen = Colors.green.shade600;
+  final Color _lightGrey = Colors.grey.shade200;
+  final Color _darkGrey = Colors.grey.shade700;
+
   Future<void> _launchURL(String url) async {
     final Uri uri = Uri.parse(url);
     try {
@@ -39,6 +48,7 @@ class _AcademicScreenState extends State<AcademicScreen> {
       }
     }
   }
+
   void _resetSelection() {
     setState(() {
       _selectedCategory = null;
@@ -46,76 +56,109 @@ class _AcademicScreenState extends State<AcademicScreen> {
       _selectedSemester = null;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: _lightGrey, // A subtle background color
       appBar: AppBar(
         title: Text(
           _selectedCategory == null
               ? 'Academic Resources'
-              : _selectedCategory!, // Display selected category or main title
-          style: const TextStyle(color: Colors.white),
+              : _selectedCategory!,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        backgroundColor: Colors.blue.shade700,
+        backgroundColor: _primaryBlue,
+        elevation: 4.0, // Add some shadow to the app bar
         iconTheme: const IconThemeData(color: Colors.white),
         leading: _selectedCategory != null
             ? IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: _resetSelection, // Go back to the main category list
+                icon: const Icon(Icons.arrow_back_ios), // A slightly modern back arrow
+                onPressed: _resetSelection,
               )
-            : null, // No back button on the initial main category list
+            : null,
       ),
-      body: _buildBody(context), // Delegates to a method that builds content based on selected category
+      body: _buildBody(context),
     );
   }
+
   // Builds the main content of the screen based on the currently selected category.
   Widget _buildBody(BuildContext context) {
     if (_selectedCategory == null) {
       // If no category is selected, show the main list of academic resource types
-      return ListView(
+      return Padding(
         padding: const EdgeInsets.all(16.0),
-        children: [
-          _buildAcademicCategoryTile(
-            context,
-            title: 'Academic Announcements',
-            icon: Icons.campaign,
-            onTap: () {
-              setState(() {
-                _selectedCategory = 'Announcements';
-              });
-            },
-          ),
-          _buildAcademicCategoryTile(
-            context,
-            title: 'Syllabus',
-            icon: Icons.assignment_outlined,
-            onTap: () {
-              setState(() {
-                _selectedCategory = 'Syllabus';
-              });
-            },
-          ),
-          _buildAcademicCategoryTile(
-            context,
-            title: 'Notes',
-            icon: Icons.notes,
-            onTap: () {
-              setState(() {
-                _selectedCategory = 'Notes';
-              });
-            },
-          ),
-          _buildAcademicCategoryTile(
-            context,
-            title: 'Time Table',
-            icon: Icons.schedule,
-            onTap: () {
-              setState(() {
-                _selectedCategory = 'Timetable';
-              });
-            },
-          ),
-        ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Explore Categories',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: _darkGrey,
+              ),
+            ),
+            const SizedBox(height: 15),
+            Expanded(
+              child: GridView.count( // Changed to GridView for a more visual layout
+                crossAxisCount: 2, // Two cards per row
+                crossAxisSpacing: 16.0,
+                mainAxisSpacing: 16.0,
+                childAspectRatio: 1.2, // Adjust aspect ratio for card size
+                children: [
+                  _buildAcademicCategoryTile(
+                    context,
+                    title: 'Announcements',
+                    icon: Icons.campaign_outlined,
+                    color: Colors.orange.shade700, // Different color for Announcements
+                    onTap: () {
+                      setState(() {
+                        _selectedCategory = 'Announcements';
+                      });
+                    },
+                  ),
+                  _buildAcademicCategoryTile(
+                    context,
+                    title: 'Syllabus',
+                    icon: Icons.assignment_outlined,
+                    color: Colors.teal.shade700, // Different color for Syllabus
+                    onTap: () {
+                      setState(() {
+                        _selectedCategory = 'Syllabus';
+                      });
+                    },
+                  ),
+                  _buildAcademicCategoryTile(
+                    context,
+                    title: 'Notes',
+                    icon: Icons.notes,
+                    color: Colors.purple.shade700, // Different color for Notes
+                    onTap: () {
+                      setState(() {
+                        _selectedCategory = 'Notes';
+                      });
+                    },
+                  ),
+                  _buildAcademicCategoryTile(
+                    context,
+                    title: 'Time Table',
+                    icon: Icons.schedule,
+                    color: Colors.red.shade700, // Different color for Timetable
+                    onTap: () {
+                      setState(() {
+                        _selectedCategory = 'Timetable';
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       );
     } else if (_selectedCategory == 'Announcements') {
       // If 'Announcements' is selected, show the announcements list directly
@@ -125,54 +168,116 @@ class _AcademicScreenState extends State<AcademicScreen> {
       return _buildCourseSemesterAndDownloadableList();
     }
   }
+
   /// Helper widget to create a tile for academic categories.
   Widget _buildAcademicCategoryTile(BuildContext context, {
     required String title,
     required IconData icon,
     required VoidCallback onTap,
+    required Color color, // Add color parameter
   }) {
     return Card(
-      elevation: 2,
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: ListTile(
-        leading: Icon(icon, color: Colors.blue.shade700, size: 30),
-        title: Text(
-          title,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-        ),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 20, color: Colors.grey),
+      elevation: 6, // Increased elevation for a floating effect
+      margin: EdgeInsets.zero, // GridView handles spacing
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15), // More rounded corners
+      ),
+      clipBehavior: Clip.antiAlias, // Ensures content respects border radius
+      child: InkWell( // Use InkWell for ripple effect on tap
         onTap: onTap,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient( // Subtle gradient background
+              colors: [color.withOpacity(0.8), color],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(icon, color: Colors.white, size: 48), // White icons on colored background
+                const SizedBox(height: 10),
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
+
   // Builds the UI for selecting course and semester, and then displaying resources based on selection.
   Widget _buildCourseSemesterAndDownloadableList() {
     return Column(
       children: [
-        Padding(
+        Container(
           padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: const Offset(0, 3), // changes position of shadow
+              ),
+            ],
+            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'Select Course:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue.shade700),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: _primaryBlue,
+                ),
               ),
               const SizedBox(height: 10),
               DropdownButtonFormField<String>(
                 value: _selectedCourse,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: _primaryBlue),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: _primaryBlue.withOpacity(0.5)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: _primaryBlue, width: 2),
+                  ),
                   labelText: 'Course',
-                  prefixIcon: Icon(Icons.school),
+                  labelStyle: TextStyle(color: _darkGrey),
+                  prefixIcon: Icon(Icons.school, color: _primaryBlue),
+                  filled: true,
+                  fillColor: Colors.blue.shade50,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
-                hint: const Text('Choose your course'),
+                hint: Text(
+                  'Choose your course',
+                  style: TextStyle(color: _darkGrey.withOpacity(0.7)),
+                ),
                 items: _courses.map((String course) {
                   return DropdownMenuItem<String>(
                     value: course,
-                    child: Text(course),
+                    child: Text(course, style: TextStyle(color: _darkGrey)),
                   );
                 }).toList(),
                 onChanged: (String? newValue) {
@@ -185,21 +290,43 @@ class _AcademicScreenState extends State<AcademicScreen> {
               const SizedBox(height: 20),
               Text(
                 'Select Semester:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue.shade700),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: _primaryBlue,
+                ),
               ),
               const SizedBox(height: 10),
               DropdownButtonFormField<String>(
                 value: _selectedSemester,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: _primaryBlue),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: _primaryBlue.withOpacity(0.5)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: _primaryBlue, width: 2),
+                  ),
                   labelText: 'Semester',
-                  prefixIcon: Icon(Icons.calendar_today),
+                  labelStyle: TextStyle(color: _darkGrey),
+                  prefixIcon: Icon(Icons.calendar_today, color: _primaryBlue),
+                  filled: true,
+                  fillColor: Colors.blue.shade50,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
-                hint: const Text('Choose your semester'),
+                hint: Text(
+                  'Choose your semester',
+                  style: TextStyle(color: _darkGrey.withOpacity(0.7)),
+                ),
                 items: _semesters.map((String semester) {
                   return DropdownMenuItem<String>(
                     value: semester,
-                    child: Text(semester),
+                    child: Text(semester, style: TextStyle(color: _darkGrey)),
                   );
                 }).toList(),
                 onChanged: (String? newValue) {
@@ -211,38 +338,40 @@ class _AcademicScreenState extends State<AcademicScreen> {
             ],
           ),
         ),
-        // Only show the list if both course and semester are selected
         Expanded(
           child: (_selectedCourse != null && _selectedSemester != null)
               ? _buildDownloadableList(
-                  _selectedCategory!, // Guaranteed not null here by the _buildBody logic
-                  _selectedCourse!,   // Guaranteed not null here by the above check
-                  _selectedSemester!, // Guaranteed not null here by the above check
+                  _selectedCategory!,
+                  _selectedCourse!,
+                  _selectedSemester!,
                 )
               : Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.info_outline, size: 60, color: Colors.grey.shade400),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Please select a course and semester to view $_selectedCategory.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
-                      ),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.swipe_up_alt, size: 80, color: Colors.grey.shade400),
+                        const SizedBox(height: 20),
+                        Text(
+                          'Select your course and semester above to view available $_selectedCategory resources.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 18, color: Colors.grey.shade600),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
         ),
       ],
     );
   }
+
   // Builds the list of downloadable academic resources (Syllabus, Notes, Timetable)
-  /// filtered by category, course, and semester.
   Widget _buildDownloadableList(String category, String course, String semester) {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
-          .collection('academic_resources') // Collection for resources
+          .collection('academic_resources')
           .where('category', isEqualTo: category)
           .where('course', isEqualTo: course)
           .where('semester', isEqualTo: semester)
@@ -250,10 +379,31 @@ class _AcademicScreenState extends State<AcademicScreen> {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator(color: _primaryBlue));
         }
         if (snapshot.hasError) {
-          return Center(child: Text('Error loading resources: ${snapshot.error}'));
+          return Center(
+              child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, size: 80, color: Colors.red.shade400),
+                const SizedBox(height: 20),
+                Text(
+                  'Error loading resources: ${snapshot.error}',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: Colors.red.shade700),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Please ensure your internet connection is stable and Firestore rules/indexes are correctly set up.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, color: _darkGrey),
+                ),
+              ],
+            ),
+          ));
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
           return Center(
@@ -269,6 +419,12 @@ class _AcademicScreenState extends State<AcademicScreen> {
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 18, color: Colors.grey.shade600),
                   ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Content will appear here once uploaded.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, color: _darkGrey),
+                  ),
                 ],
               ),
             ),
@@ -276,44 +432,72 @@ class _AcademicScreenState extends State<AcademicScreen> {
         }
         final resources = snapshot.data!.docs.map((doc) => AcademicResource.fromFirestore(doc)).toList();
         return ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          padding: const EdgeInsets.all(16.0), // Consistent padding
           itemCount: resources.length,
           itemBuilder: (context, index) {
             final resource = resources[index];
             return Card(
-              elevation: 2,
-              margin: const EdgeInsets.symmetric(vertical: 8.0),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              child: ListTile(
-                leading: Icon(
-                  // Choose icon based on category
-                  category == 'Syllabus' ? Icons.description
-                  : category == 'Notes' ? Icons.sticky_note_2
-                  : Icons.calendar_month, // Default for Timetable
-                  color: Colors.blue.shade700,
-                  size: 30,
-                ),
-                title: Text(
-                  resource.title,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                ),
-                subtitle: resource.description != null && resource.description!.isNotEmpty
-                    ? Text(
-                        resource.description!,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: Colors.grey.shade600),
-                      )
-                    : null, // Don't show subtitle if description is empty
-                trailing: (resource.fileUrl != null && resource.fileUrl!.isNotEmpty)
-                    ? IconButton(
-                        icon: const Icon(Icons.download, color: Colors.green),
-                        onPressed: () => _launchURL(resource.fileUrl!),
-                      )
-                    : null, // Don't show download icon if no file URL
+              elevation: 4, // Slightly higher elevation
+              margin: const EdgeInsets.only(bottom: 16.0), // More space between cards
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)), // More rounded corners
+              child: InkWell( // Added InkWell for ripple effect on the whole card
                 onTap: (resource.fileUrl != null && resource.fileUrl!.isNotEmpty)
-                    ? () => _launchURL(resource.fileUrl!) // Open URL on tile tap
-                    : null, // Disable tap if no file URL
+                    ? () => _launchURL(resource.fileUrl!)
+                    : null,
+                borderRadius: BorderRadius.circular(15), // Match card border radius
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0), // Padding inside the card
+                  child: Row(
+                    children: [
+                      Icon(
+                        category == 'Syllabus' ? Icons.description
+                        : category == 'Notes' ? Icons.sticky_note_2
+                        : Icons.calendar_month,
+                        color: _primaryBlue,
+                        size: 36, // Larger icon
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              resource.title,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: _darkGrey,
+                              ),
+                            ),
+                            if (resource.description != null && resource.description!.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4.0),
+                                child: Text(
+                                  resource.description!,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                                ),
+                              ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                'Published: ${DateFormat('MMM d, yyyy').format(resource.publishedDate)} by ${resource.publishedBy ?? 'Admin'}',
+                                style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (resource.fileUrl != null && resource.fileUrl!.isNotEmpty)
+                        IconButton(
+                          icon: Icon(Icons.download_for_offline, color: _accentGreen, size: 30), // More prominent download icon
+                          onPressed: () => _launchURL(resource.fileUrl!),
+                          tooltip: 'Download Resource',
+                        ),
+                    ],
+                  ),
+                ),
               ),
             );
           },
@@ -326,15 +510,36 @@ class _AcademicScreenState extends State<AcademicScreen> {
   Widget _buildAnnouncementsList() {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
-          .collection('announcements') // Collection for announcements
-          .orderBy('date', descending: true) // Assuming 'date' field for announcements
+          .collection('announcements')
+          .orderBy('date', descending: true)
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator(color: _primaryBlue));
         }
         if (snapshot.hasError) {
-          return Center(child: Text('Error loading announcements: ${snapshot.error}'));
+          return Center(
+              child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, size: 80, color: Colors.red.shade400),
+                const SizedBox(height: 20),
+                Text(
+                  'Error loading announcements: ${snapshot.error}',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: Colors.red.shade700),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Please ensure your internet connection is stable and Firestore rules are correctly set up.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, color: _darkGrey),
+                ),
+              ],
+            ),
+          ));
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
           return Center(
@@ -343,13 +548,18 @@ class _AcademicScreenState extends State<AcademicScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // FIX: Changed Icons.campaign_off to Icons.notifications_off
                   Icon(Icons.notifications_off, size: 80, color: Colors.grey.shade400),
                   const SizedBox(height: 20),
                   Text(
                     'No announcements yet!',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 18, color: Colors.grey.shade600),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Stay tuned for updates!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, color: _darkGrey),
                   ),
                 ],
               ),
@@ -360,54 +570,71 @@ class _AcademicScreenState extends State<AcademicScreen> {
         final announcements = snapshot.data!.docs.map((doc) => AcademicResource.fromFirestore(doc)).toList();
 
         return ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          padding: const EdgeInsets.all(16.0),
           itemCount: announcements.length,
           itemBuilder: (context, index) {
             final announcement = announcements[index];
             return Card(
-              elevation: 2,
-              margin: const EdgeInsets.symmetric(vertical: 8.0),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              child: ListTile(
-                title: Text(
-                  announcement.title,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      announcement.content ?? 'No content available.', // Display content, with fallback
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: Colors.grey.shade700),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      // Format date and display publisher
-                      '${DateFormat('MMM d,yyyy').format(announcement.publishedDate)} by ${announcement.publishedBy ?? 'Admin'}',
-                      style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                    ),
-                  ],
-                ),
+              elevation: 4,
+              margin: const EdgeInsets.only(bottom: 16.0),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+              child: InkWell(
                 onTap: () {
-                  // Show full announcement in a dialog
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: Text(announcement.title),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                      title: Text(
+                        announcement.title,
+                        style: TextStyle(fontWeight: FontWeight.bold, color: _primaryBlue),
+                      ),
                       content: SingleChildScrollView(
-                        child: Text(announcement.content ?? 'No content available.'),
+                        child: Text(
+                          announcement.content ?? 'No content available.',
+                          style: TextStyle(color: _darkGrey, fontSize: 16),
+                        ),
                       ),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.of(context).pop(),
-                          child: const Text('Close'),
+                          child: Text('Close', style: TextStyle(color: _primaryBlue)),
                         ),
                       ],
                     ),
                   );
                 },
+                borderRadius: BorderRadius.circular(15),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        announcement.title,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: _primaryBlue,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        announcement.content ?? 'No content available.',
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: _darkGrey, fontSize: 14),
+                      ),
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: Text(
+                          '${DateFormat('MMM d, yyyy - hh:mm a').format(announcement.publishedDate)} by ${announcement.publishedBy ?? 'Admin'}',
+                          style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             );
           },
