@@ -43,7 +43,7 @@ class FacultyScreen extends StatelessWidget {
     ),
   ];
 
-  const FacultyScreen({super.key});
+  //const FacultyScreen({super.key});
 
 
   @override

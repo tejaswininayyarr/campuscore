@@ -26,7 +26,6 @@ import 'alumni_screen.dart'; // Placeholder screen
 import 'faculty_screen.dart'; // Placeholder screen
 import 'guidance_screen.dart'; // Placeholder screen
 import 'event_detail_screen.dart'; // Import the event detail screen
-import 'event_screen.dart';
 import 'add_event_screen.dart'; 
 void main() async {
   // Ensure Flutter widgets are initialized before Firebase. This is crucial.
@@ -55,7 +54,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'College Connect',
       theme: ThemeData(
-         scaffoldBackgroundColor: const Color.fromARGB(255, 31, 31, 31),
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
@@ -87,7 +85,7 @@ class MyApp extends StatelessWidget {
         '/alumni': (context) =>  AlumniScreen(),
         '/faculty': (context) => FacultyScreen(),
         '/guidance': (context) => GuidanceScreen(),
-        '/add_edit_goal': (context) => AddEditGoalScreen()
+        
       },
       // You can also define an onGenerateRoute for more dynamic routing,
       // especially for passing arguments to screens like AddEditGoalScreen
