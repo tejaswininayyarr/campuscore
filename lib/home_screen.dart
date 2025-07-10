@@ -9,15 +9,15 @@ import 'auth_service.dart'; // Make sure this path is correct
 // These screens (AcademicResourcesScreen, CampusEventsScreen) should NOT have their own Scaffold or AppBar.
 import 'academic.dart'; // Ensure path is correct
 import 'event_screen.dart';
-import 'add_event_screen.dart'; // Ensure path is correct
+// Ensure path is correct
 
 // Import other screens accessible via the Drawer (these will still be full Scaffolds)
-import 'user_profile_screen.dart'; // Ensure path is correct
-import 'goal_task_manager_screen.dart'; // Ensure path is correct
+// Ensure path is correct
+// Ensure path is correct
 // import 'mentorship_screen.dart'; // REMOVED: Mentorship screen import
-import 'alumni_screen.dart'; // Ensure path is correct
-import 'faculty_screen.dart'; // Ensure path is correct
-import 'guidance_screen.dart'; // Ensure path is correct
+// Ensure path is correct
+// Ensure path is correct
+// Ensure path is correct
 
 
 class HomeScreen extends StatefulWidget {

@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart'; 
 import 'models/faculty_model.dart'; 
 class FacultyScreen extends StatelessWidget { 
+  //const FacultyScreen({super.key});
+
   final List<Faculty> demoFacultyData = [
     Faculty(
       name: 'Dr. A. Sharma',
@@ -40,6 +42,9 @@ class FacultyScreen extends StatelessWidget {
       yearsAtUniversity: '12 years',
     ),
   ];
+
+  const FacultyScreen({super.key});
+
 
   @override
   Widget build(BuildContext context) {

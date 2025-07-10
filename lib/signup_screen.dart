@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart'; // To save user data to F
 import 'auth_service.dart'; // Make sure this import is correct
 
 class SignupScreen extends StatefulWidget {
-  SignupScreen({super.key});
+  const SignupScreen({super.key});
 
   @override
   State<SignupScreen> createState() => _SignupScreenState();

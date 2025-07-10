@@ -1,7 +1,9 @@
 // Placeholder screen for the Student Guidance (Roadmap & Resume) feature. 
 import 'package:flutter/material.dart'; 
  
-class GuidanceScreen extends StatelessWidget { 
+class GuidanceScreen extends StatelessWidget {
+  const GuidanceScreen({super.key});
+ 
   @override 
   Widget build(BuildContext context) { 
     return Scaffold( 

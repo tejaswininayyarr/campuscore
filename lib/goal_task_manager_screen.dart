@@ -8,6 +8,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'goal_model.dart'; // Import the Goal data model
 
 class GoalTaskManagerScreen extends StatefulWidget {
+  const GoalTaskManagerScreen({super.key});
+
   @override
   _GoalTaskManagerScreenState createState() => _GoalTaskManagerScreenState();
 }
@@ -271,9 +273,9 @@ class _GoalTaskManagerScreenState extends State<GoalTaskManagerScreen> {
         onPressed: () {
           Navigator.of(context).pushNamed('/add_edit_goal'); // Navigate to the Add/Edit Goal screen to add a new goal
         },
-        backgroundColor: Colors.blue.shade600,
-        child: Icon(Icons.add, color: Colors.white), // Plus icon
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)), // Rounded FAB shape
+        backgroundColor: Colors.blue.shade600, // Plus icon
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        child: Icon(Icons.add, color: Colors.white), // Rounded FAB shape
       ),
     );
   }

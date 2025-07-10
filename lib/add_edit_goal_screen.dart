@@ -9,7 +9,7 @@ import 'package:intl/intl.dart'; // Required for date formatting (ensure 'intl' 
 class AddEditGoalScreen extends StatefulWidget {
   final Goal? goal; // Optional: If a Goal object is passed, it means we are editing an existing goal.
 
-  AddEditGoalScreen({this.goal});
+  const AddEditGoalScreen({super.key, this.goal});
 
   @override
   _AddEditGoalScreenState createState() => _AddEditGoalScreenState();
